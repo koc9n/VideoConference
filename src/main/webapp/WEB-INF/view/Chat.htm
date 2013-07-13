@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- saved from url=(0094)http://svn.apache.org/viewvc/tomcat/tc7.0.x/trunk/webapps/examples/websocket/chat.html?view=co -->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Apache Tomcat WebSocket Examples: Chat</title>
+    <style type="text/css">
+        input#chat {
+            width: 410px
+        }
+
+        #console-container {
+            width: 400px;
+        }
+
+        #console {
+            border: 1px solid #CCCCCC;
+            border-right-color: #999999;
+            border-bottom-color: #999999;
+            height: 170px;
+            overflow-y: scroll;
+            padding: 5px;
+            width: 100%;
+        }
+
+        #console p {
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+
+</head>
+<body>
+
+
+<div>
+    <p>
+        <input type="text" placeholder="type and press enter to chat" id="chat">
+    </p>
+
+    <div id="console-container">
+        <div id="console"><p style="word-wrap: break-word;">Info: WebSocket closed.</p></div>
+    </div>
+</div>
+<noscript>&lt;h2 style="color: #ff0000"&gt;Seems your browser doesn't support Javascript! Websockets rely on Javascript
+    being enabled. Please enable
+    Javascript and reload this page!&lt;/h2&gt;</noscript>
+<video id="myVideo" autoplay></video>
+<canvas width="320" id="canvas" height="240" style="display: block;float:right;border: 1px solid #000000"></canvas>
+<script type="text/javascript">
+
+    function dataURItoBlob(dataURI) {
+        var binary = atob(dataURI.split(',')[1]);
+        var array = [];
+        for (var i = 0; i < binary.length; i++) {
+            array.push(binary.charCodeAt(i));
+        }
+        return new Blob([new Uint8Array(array)], {type: 'image/jpeg'});
+    }
+
+    var video = document.querySelector('video');
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    var Chat = {};
+
+    Chat.socket = null;
+
+    Chat.connect = (function (host) {
+        if ('WebSocket' in window) {
+            Chat.socket = new WebSocket(host);
+        } else if ('MozWebSocket' in window) {
+            Chat.socket = new MozWebSocket(host);
+        } else {
+            Console.log('Error: WebSocket is not supported by this browser.');
+            return;
+        }
+
+        Chat.socket.onopen = function () {
+            Console.log('Info: WebSocket connection opened.');
+            document.getElementById('chat').onkeydown = function (event) {
+                if (event.keyCode == 13) {
+                    Chat.sendMessage();
+                }
+            };
+
+        };
+
+        Chat.socket.onclose = function () {
+            document.getElementById('chat').onkeydown = null;
+            Console.log('Info: WebSocket closed.');
+        };
+
+        Chat.socket.onmessage = function (message) {
+            var blobImg = message.data;
+            if ( blobImg instanceof Blob) {
+                Console.log(blobImg);
+                var img = new Image;
+                img.src = window.URL.createObjectURL(blobImg);
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, 320, 240);
+                }   ;
+
+            } else{
+                Console.log(blobImg);
+            }
+        };
+    });
+
+    Chat.initialize = function () {
+        if (window.location.protocol == 'http:') {
+            Chat.connect('ws://' + window.location.host + '/websocket/video');
+        } else {
+            Chat.connect('wss://' + window.location.host + '/websocket/video');
+        }
+    };
+
+    Chat.sendMessage = (function () {
+        var message = document.getElementById('chat').value;
+        if (message != '') {
+            Chat.socket.send(message);
+            document.getElementById('chat').value = '';
+        }
+    });
+
+    Chat.sendData = (function (data) {
+        Chat.socket.send(data);
+    });
+
+    var Console = {};
+
+    Console.log = (function (message) {
+        var console = document.getElementById('console');
+        var p = document.createElement('p');
+        p.style.wordWrap = 'break-word';
+        p.innerHTML = message;
+        console.appendChild(p);
+        while (console.childNodes.length > 25) {
+            console.removeChild(console.firstChild);
+        }
+        console.scrollTop = console.scrollHeight;
+    });
+
+    var ws = Chat.socket;
+
+
+
+</script>
+<script type="text/javascript">
+
+    var onFailSoHard = function (e) {
+        console.log('Reeeejected!', e);
+    };
+    function hasGetUserMedia() {
+// Note: Opera is unprefixed.
+        return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                navigator.mozGetUserMedia || navigator.msGetUserMedia);
+    }
+
+    if (hasGetUserMedia()) {
+// Good to go!
+    } else {
+        alert('getUserMedia() is not supported in your browser');
+    }
+    window.URL = window.URL || window.webkitURL;
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+
+    if (navigator.getUserMedia) {
+        navigator.getUserMedia({audio: true, video: true}, function (stream) {
+            video.src = window.URL.createObjectURL(stream);
+            var new_blob = dataURItoBlob(video.src);
+            Chat.socket.send(stream);
+        }, onFailSoHard);
+//
+    } else {
+        video.src = 'somevideo.webm'; // fallback.
+    }
+    Chat.initialize();
+/*    timer = setInterval(
+            function () {
+                ctx.drawImage(video, 0, 0, 320, 240);
+                var dataB = canvas.toDataURL('image/jpeg', 1.0);
+                if (dataB === 'undefined') {
+                    //nothing
+                } else {
+                    var new_blob = dataURItoBlob(dataB);
+
+                }
+            }, 10000);*/
+
+</script>
+</body>
+</html>
