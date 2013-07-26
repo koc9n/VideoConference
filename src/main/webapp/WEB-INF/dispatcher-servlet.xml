@@ -7,6 +7,7 @@
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
     <mvc:annotation-driven />
     <mvc:default-servlet-handler/>
+    <mvc:resources mapping="/resources/**" location="WEB-INF/resources/"/>
     <mvc:view-controller   path="/"  view-name="/Chat"/>
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/view" p:suffix=".htm" />

@@ -77,7 +77,12 @@ public class VideoWebSocketServlet extends WebSocketServlet {
                         // Ignore
                     }
                 } else {
-
+                    try {
+                        ByteBuffer buffer = ByteBuffer.wrap(IOUtils.toByteArray(inputStream));
+                        connection.getWsOutbound().writeBinaryMessage(buffer);
+                    } catch (IOException ignore) {
+                        // Ignore
+                    }
                 }
             }
 
@@ -85,8 +90,7 @@ public class VideoWebSocketServlet extends WebSocketServlet {
 
         @Override
         protected void onTextData(Reader reader) throws IOException {
-            String filteredMessage = String.format("%s: %s",
-                    nickname, IOUtils.toString(reader));
+            String filteredMessage = IOUtils.toString(reader);
             broadcast(filteredMessage);
         }
 
