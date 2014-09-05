@@ -32,13 +32,12 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <servlet>
-        <servlet-name>vWebServlet</servlet-name>
-        <servlet-class>com.gmail.mironchik.kos.web.VideoWebSocketServlet</servlet-class>
+        <servlet-name>default</servlet-name>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>vWebServlet</servlet-name>
-        <url-pattern>/websocket/video</url-pattern>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/ws/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
