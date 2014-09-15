@@ -1,4 +1,4 @@
-package com.gmail.mironchik.kos.web;
+package com.gmail.mironchik.kos.websocket.ws.chat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,20 +44,23 @@ public class ChatAnnotation {
     private static final String GUEST_PREFIX = "Guest";
     private static final AtomicInteger connectionIds = new AtomicInteger(0);
     private static final Set<ChatAnnotation> connections =
-            new CopyOnWriteArraySet<>();
+            new CopyOnWriteArraySet();
 
-    private final String nickname;
+    private static final Set<String> connectedUsers =
+            new CopyOnWriteArraySet();
+
+    private String nickname;
     private Session session;
 
-    public ChatAnnotation() {
-        nickname = GUEST_PREFIX + connectionIds.getAndIncrement();
-    }
+    public ChatAnnotation() {}
 
 
     @OnOpen
     public void start(Session session) {
         this.session = session;
         connections.add(this);
+        nickname = (String) session.getRequestParameterMap().get("user").get(0);
+        connectedUsers.add(nickname);
         String message = String.format("* %s %s", nickname, "has joined.");
         broadcast(message);
     }
@@ -68,6 +71,8 @@ public class ChatAnnotation {
         connections.remove(this);
         String message = String.format("* %s %s",
                 nickname, "has disconnected.");
+        connectedUsers.remove(nickname);
+
         broadcast(message);
     }
 
