@@ -1,14 +1,18 @@
 package com.gmail.mironchik.kos.websocket.ws.chat;
 
+import com.gmail.mironchik.kos.web.dto.EventType;
+import com.gmail.mironchik.kos.web.dto.Member;
+import com.gmail.mironchik.kos.web.dto.Message;
+import com.gmail.mironchik.kos.web.dto.TransferData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,47 +45,76 @@ public class ChatAnnotation {
 
     private static final Log log = LogFactory.getLog(ChatAnnotation.class);
 
-    private static final String GUEST_PREFIX = "Guest";
-    private static final AtomicInteger connectionIds = new AtomicInteger(0);
-    private static final Set<ChatAnnotation> connections =
-            new CopyOnWriteArraySet();
+    private static final Map<String, Session> connectedUsers =
+            new HashMap();
+    public static final String NICK = "screen_name";
+    public static final String PHOTO_URL = "photo_200_orig";
+    public static final String FIRST_NAME = "first_name";
+    public static final String LAST_NAME = "last_name";
 
-    private static final Set<String> connectedUsers =
-            new CopyOnWriteArraySet();
+    ObjectMapper mapper = new ObjectMapper();
 
     private String nickname;
     private Session session;
-
-    public ChatAnnotation() {}
 
 
     @OnOpen
     public void start(Session session) {
         this.session = session;
-        connections.add(this);
-        nickname = (String) session.getRequestParameterMap().get("user").get(0);
-        connectedUsers.add(nickname);
-        String message = String.format("* %s %s", nickname, "has joined.");
-        broadcast(message);
+        this.nickname = getParamFromRequest(session, NICK);
+
+        connectedUsers.put(nickname, session);
+
+        TransferData transferData = new TransferData(EventType.USER_CONNECTED);
+        transferData.setMember(obtainMember(session));
+        broadcast(writeData(transferData));
+    }
+
+    private String writeData(TransferData transferData) {
+        String message = null;
+        try {
+            message = mapper.writeValueAsString(transferData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return message;
+    }
+
+    private Member obtainMember(Session session) {
+        return new Member(getParamFromRequest(session, NICK),
+                getParamFromRequest(session, PHOTO_URL),
+                getParamFromRequest(session, FIRST_NAME),
+                getParamFromRequest(session, LAST_NAME));
+    }
+
+    private String getParamFromRequest(Session session, String paramName) {
+        return session.getRequestParameterMap().get(paramName).get(0);
     }
 
 
     @OnClose
     public void end() {
-        connections.remove(this);
-        String message = String.format("* %s %s",
-                nickname, "has disconnected.");
+
+        TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
+        transferData.setMember(obtainMember(connectedUsers.get(nickname)));
+
         connectedUsers.remove(nickname);
 
-        broadcast(message);
+        broadcast(writeData(transferData));
     }
 
 
     @OnMessage
     public void incoming(String message) {
         // Never trust the client
-        String filteredMessage = String.format("%s: %s",
-                nickname, message.toString());
+
+        String filteredMessage = null;
+        try {
+            filteredMessage = String.format("%s: %s",
+                    nickname, mapper.readValue(message, Message.class).getText()).toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         broadcast(filteredMessage);
     }
 
@@ -93,21 +126,22 @@ public class ChatAnnotation {
 
 
     private static void broadcast(String msg) {
-        for (ChatAnnotation client : connections) {
+        for (String nickname : connectedUsers.keySet()) {
+            Session session = connectedUsers.get(nickname);
             try {
-                synchronized (client) {
-                    client.session.getBasicRemote().sendText(msg);
+                synchronized (session) {
+                    session.getBasicRemote().sendText(msg);
                 }
             } catch (IOException e) {
                 log.debug("Chat Error: Failed to send message to client", e);
-                connections.remove(client);
+                connectedUsers.remove(nickname);
                 try {
-                    client.session.close();
+                    session.close();
                 } catch (IOException e1) {
                     // Ignore
                 }
                 String message = String.format("* %s %s",
-                        client.nickname, "has been disconnected.");
+                        nickname, "has been disconnected.");
                 broadcast(message);
             }
         }

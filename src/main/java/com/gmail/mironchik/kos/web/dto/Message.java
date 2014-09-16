@@ -1,4 +1,4 @@
-package com.gmail.mironchik.kos.web;
+package com.gmail.mironchik.kos.web.dto;
 
 import org.springframework.stereotype.Controller;
 
