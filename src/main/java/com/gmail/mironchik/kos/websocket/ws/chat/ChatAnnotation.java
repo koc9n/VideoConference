@@ -52,7 +52,7 @@ public class ChatAnnotation {
     public static final String FIRST_NAME = "first_name";
     public static final String LAST_NAME = "last_name";
 
-    ObjectMapper mapper = new ObjectMapper();
+    private static ObjectMapper mapper = new ObjectMapper();
 
     private String nickname;
     private Session session;
@@ -70,7 +70,7 @@ public class ChatAnnotation {
         broadcast(writeData(transferData));
     }
 
-    private String writeData(TransferData transferData) {
+    private static String writeData(TransferData transferData) {
         String message = null;
         try {
             message = mapper.writeValueAsString(transferData);
@@ -80,14 +80,14 @@ public class ChatAnnotation {
         return message;
     }
 
-    private Member obtainMember(Session session) {
+    private static Member obtainMember(Session session) {
         return new Member(getParamFromRequest(session, NICK),
                 getParamFromRequest(session, PHOTO_URL),
                 getParamFromRequest(session, FIRST_NAME),
                 getParamFromRequest(session, LAST_NAME));
     }
 
-    private String getParamFromRequest(Session session, String paramName) {
+    private static String getParamFromRequest(Session session, String paramName) {
         return session.getRequestParameterMap().get(paramName).get(0);
     }
 
@@ -134,15 +134,18 @@ public class ChatAnnotation {
                 }
             } catch (IOException e) {
                 log.debug("Chat Error: Failed to send message to client", e);
+
+                TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
+                transferData.setMember(obtainMember(connectedUsers.get(nickname)));
+
                 connectedUsers.remove(nickname);
                 try {
                     session.close();
                 } catch (IOException e1) {
                     // Ignore
                 }
-                String message = String.format("* %s %s",
-                        nickname, "has been disconnected.");
-                broadcast(message);
+                broadcast(writeData(transferData));
+
             }
         }
     }
