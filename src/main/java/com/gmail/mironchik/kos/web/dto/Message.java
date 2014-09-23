@@ -2,6 +2,7 @@ package com.gmail.mironchik.kos.web.dto;
 
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Set;
 public class Message {
     private String sender;
     private String text;
-    private Set<String> recipients;
+    private List<String> recipients;
 
     public String getSender() {
         return sender;
@@ -30,11 +31,11 @@ public class Message {
         this.text = text;
     }
 
-    public Set<String> getRecipients() {
+    public List<String> getRecipients() {
         return recipients;
     }
 
-    public void setRecipients(Set<String> recipients) {
+    public void setRecipients(List<String> recipients) {
         this.recipients = recipients;
     }
 }

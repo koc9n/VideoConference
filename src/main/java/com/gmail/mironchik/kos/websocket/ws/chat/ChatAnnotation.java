@@ -4,6 +4,7 @@ import com.gmail.mironchik.kos.web.dto.EventType;
 import com.gmail.mironchik.kos.web.dto.Member;
 import com.gmail.mironchik.kos.web.dto.Message;
 import com.gmail.mironchik.kos.web.dto.TransferData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -47,6 +48,8 @@ public class ChatAnnotation {
 
     private static final Map<String, Session> connectedUsers =
             new HashMap();
+    private static final Map<String, Integer> repeatedUsers =
+            new HashMap();
     public static final String NICK = "screen_name";
     public static final String PHOTO_URL = "photo_200_orig";
     public static final String FIRST_NAME = "first_name";
@@ -61,12 +64,17 @@ public class ChatAnnotation {
     @OnOpen
     public void start(Session session) {
         this.session = session;
-        this.nickname = getParamFromRequest(session, NICK);
+        String nick = getParamFromRequest(session, NICK);
+        if (repeatedUsers.keySet().contains(nick)) {
+            repeatedUsers.put(nick, repeatedUsers.get(nick) + 1);
+            nick += "." + repeatedUsers.get(nick);
+        }
+        connectedUsers.put(nick, session);
 
-        connectedUsers.put(nickname, session);
+        this.nickname = nick;
 
         TransferData transferData = new TransferData(EventType.USER_CONNECTED);
-        transferData.setMember(obtainMember(session));
+        transferData.setMember(obtainMember(session, nickname));
         broadcast(writeData(transferData));
     }
 
@@ -75,13 +83,13 @@ public class ChatAnnotation {
         try {
             message = mapper.writeValueAsString(transferData);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
         }
         return message;
     }
 
-    private static Member obtainMember(Session session) {
-        return new Member(getParamFromRequest(session, NICK),
+    private static Member obtainMember(Session session, String nickname) {
+        return new Member(nickname,
                 getParamFromRequest(session, PHOTO_URL),
                 getParamFromRequest(session, FIRST_NAME),
                 getParamFromRequest(session, LAST_NAME));
@@ -96,7 +104,7 @@ public class ChatAnnotation {
     public void end() {
 
         TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
-        transferData.setMember(obtainMember(connectedUsers.get(nickname)));
+        transferData.setMember(obtainMember(connectedUsers.get(nickname), nickname));
 
         connectedUsers.remove(nickname);
 
@@ -107,15 +115,16 @@ public class ChatAnnotation {
     @OnMessage
     public void incoming(String message) {
         // Never trust the client
-
-        String filteredMessage = null;
+        Message msg = null;
         try {
-            filteredMessage = String.format("%s: %s",
-                    nickname, mapper.readValue(message, Message.class).getText()).toString();
+            msg = mapper.readValue(message, Message.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
         }
-        broadcast(filteredMessage);
+        TransferData transferData = new TransferData(EventType.MESSAGE);
+        transferData.setMessage(msg);
+
+        broadcast(writeData(transferData));
     }
 
 
@@ -127,26 +136,30 @@ public class ChatAnnotation {
 
     private static void broadcast(String msg) {
         for (String nickname : connectedUsers.keySet()) {
-            Session session = connectedUsers.get(nickname);
-            try {
-                synchronized (session) {
-                    session.getBasicRemote().sendText(msg);
-                }
-            } catch (IOException e) {
-                log.debug("Chat Error: Failed to send message to client", e);
+            sendMessageByNick(msg, nickname);
+        }
+    }
 
-                TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
-                transferData.setMember(obtainMember(connectedUsers.get(nickname)));
-
-                connectedUsers.remove(nickname);
-                try {
-                    session.close();
-                } catch (IOException e1) {
-                    // Ignore
-                }
-                broadcast(writeData(transferData));
-
+    private static void sendMessageByNick(String msg, String nickname) {
+        Session session = connectedUsers.get(nickname);
+        try {
+            synchronized (session) {
+                session.getBasicRemote().sendText(msg);
             }
+        } catch (IOException e) {
+            log.info("Chat Error: Failed to send message to client", e);
+
+            TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
+            transferData.setMember(obtainMember(connectedUsers.get(nickname), nickname));
+
+            connectedUsers.remove(nickname);
+            try {
+                session.close();
+            } catch (IOException e1) {
+                // Ignore
+            }
+            broadcast(writeData(transferData));
+
         }
     }
 }
