@@ -4,7 +4,6 @@ import com.gmail.mironchik.kos.web.dto.EventType;
 import com.gmail.mironchik.kos.web.dto.Member;
 import com.gmail.mironchik.kos.web.dto.Message;
 import com.gmail.mironchik.kos.web.dto.TransferData;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
