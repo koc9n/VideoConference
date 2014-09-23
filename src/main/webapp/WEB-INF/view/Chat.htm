@@ -68,7 +68,7 @@
                                         }
                                     });
                                 } else {
-                                    alert('not auth');
+                                    Chat.socket.close();
                                 }
                             }
                             VK.Auth.login(authInfo);
