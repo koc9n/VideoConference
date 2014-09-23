@@ -22,13 +22,13 @@
                       <span class="input-group-btn">
                         <button class="btn btn-default" type="button" onclick="sendData();">Go!</button>
                       </span>
-                        <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
-
-                        <div id="login_button" onclick="VK.Auth.login(authInfo);"></div>
-                        <button id="logout_button" onclick="VK.Auth.logout(authInfo);">Logout</button>
+                      <span class="input-group-btn">
+<script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+                        <button id="login_button" class="btn btn-default" type="button" onclick="VK.Auth.login(authInfo);">Login VK</button>
+                        <button class="btn btn-default" type="button" id="logout_button" onclick="VK.Auth.logout(authInfo);">Logout VK</button>
 
                         <script language="javascript">
-                            var enteredUser;
+                            var enteredUser = null;
                             var messages = [];
                             function sendData(){
                                 var message = document.getElementById('messageInput').value;
@@ -42,7 +42,7 @@
                                 if (response.session) {
                                     VK.Api.call('users.get', {uids: response.session.mid, fields:"screen_name,photo_200_orig"}, function(r) {
                                         if(r.response) {
-                                            enteredUser = r.response[0].screen_name;
+
                                             Chat.initialize('/ws/chat?screen_name=' + r.response[0].screen_name +
                                                     '&first_name=' + r.response[0].first_name +
                                                     '&last_name=' + r.response[0].last_name +
@@ -57,7 +57,9 @@
                                                         scope.$apply();
                                                         break;
                                                     case 'USER_CONNECTED':
+                                                        if (enteredUser == null){
                                                             enteredUser = dataObj.member.nick;
+                                                        }
                                                         break;
                                                     case 'USER_DISCONNECTED':
                                                         break;
@@ -72,6 +74,7 @@
                             VK.Auth.login(authInfo);
                             VK.UI.button('login_button');
                         </script>
+                      </span>
                     </div>
                 </div>
                 <br />

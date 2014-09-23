@@ -68,6 +68,8 @@ public class ChatAnnotation {
         if (repeatedUsers.keySet().contains(nick)) {
             repeatedUsers.put(nick, repeatedUsers.get(nick) + 1);
             nick += "." + repeatedUsers.get(nick);
+        } else {
+            repeatedUsers.put(nick, 1);
         }
         connectedUsers.put(nick, session);
 
@@ -90,9 +92,9 @@ public class ChatAnnotation {
 
     private static Member obtainMember(Session session, String nickname) {
         return new Member(nickname,
-                getParamFromRequest(session, PHOTO_URL),
                 getParamFromRequest(session, FIRST_NAME),
-                getParamFromRequest(session, LAST_NAME));
+                getParamFromRequest(session, LAST_NAME),
+                getParamFromRequest(session, PHOTO_URL));
     }
 
     private static String getParamFromRequest(Session session, String paramName) {
