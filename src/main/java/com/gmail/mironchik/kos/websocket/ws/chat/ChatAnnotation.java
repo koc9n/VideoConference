@@ -12,7 +12,9 @@ import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,9 +47,7 @@ public class ChatAnnotation {
 
     private static final Log log = LogFactory.getLog(ChatAnnotation.class);
 
-    private static final Map<String, Session> connectedUsers =
-            new HashMap();
-    private static final Map<String, Integer> repeatedUsers =
+    private static final Map<String, Set<Session>> connectedUsers =
             new HashMap();
     public static final String NICK = "screen_name";
     public static final String PHOTO_URL = "photo_200_orig";
@@ -62,17 +62,12 @@ public class ChatAnnotation {
 
     @OnOpen
     public void start(Session session) {
+        this.nickname = getParamFromRequest(session, NICK);
         this.session = session;
-        String nick = getParamFromRequest(session, NICK);
-        if (repeatedUsers.keySet().contains(nick)) {
-            repeatedUsers.put(nick, repeatedUsers.get(nick) + 1);
-            nick += "." + repeatedUsers.get(nick);
-        } else {
-            repeatedUsers.put(nick, 1);
+        if (!connectedUsers.keySet().contains(nickname)) {
+            connectedUsers.put(nickname, new HashSet<>());
         }
-        connectedUsers.put(nick, session);
-
-        this.nickname = nick;
+        connectedUsers.get(nickname).add(session);
 
         TransferData transferData = new TransferData(EventType.USER_CONNECTED);
         transferData.setMember(obtainMember(session, nickname));
@@ -105,9 +100,9 @@ public class ChatAnnotation {
     public void end() {
 
         TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
-        transferData.setMember(obtainMember(connectedUsers.get(nickname), nickname));
+        transferData.setMember(obtainMember(session, nickname));
 
-        connectedUsers.remove(nickname);
+        connectedUsers.get(nickname).remove(session);
 
         broadcast(writeData(transferData));
     }
@@ -142,25 +137,26 @@ public class ChatAnnotation {
     }
 
     private static void sendMessageByNick(String msg, String nickname) {
-        Session session = connectedUsers.get(nickname);
-        try {
-            synchronized (session) {
-                session.getBasicRemote().sendText(msg);
-            }
-        } catch (IOException e) {
-            log.info("Chat Error: Failed to send message to client", e);
-
-            TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
-            transferData.setMember(obtainMember(connectedUsers.get(nickname), nickname));
-
-            connectedUsers.remove(nickname);
+        Set<Session> sessions = connectedUsers.get(nickname);
+        for (Session session : sessions) {
             try {
-                session.close();
-            } catch (IOException e1) {
-                // Ignore
-            }
-            broadcast(writeData(transferData));
+                synchronized (session) {
+                    session.getBasicRemote().sendText(msg);
+                }
+            } catch (IOException e) {
+                log.info("Chat Error: Failed to send message to client", e);
 
+                TransferData transferData = new TransferData(EventType.USER_DISCONNECTED);
+                transferData.setMember(obtainMember(session, nickname));
+
+                connectedUsers.remove(nickname);
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+                broadcast(writeData(transferData));
+            }
         }
     }
 }

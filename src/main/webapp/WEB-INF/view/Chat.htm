@@ -6,19 +6,22 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Apache Tomcat WebSocket Examples: Chat</title>
     <link href="/resources/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="/resources/bootstrap/css/bootstrap-theme.css" rel="stylesheet">
+    <script src='/resources/jquery-1.10.2.min.js'></script>
+    <script src='/resources/bootstrap/js/bootstrap.min.js'></script>
     <script src='/resources/angular.js'></script>
     <script src='/resources/controller.js'></script>
     <script src="//vk.com/js/api/openapi.js"></script>
     <script src='/resources/chat/js/chatsocket.js'></script>
-    <script src='/resources/chat/js/login.js'></script>
-    <script language="javascript">
-        var enteredUser = null;
-        var messages = [];
+    <script>
+        $(document).ready(function () {
+            $("#thumb").tooltip();
+        });
     </script>
 </head>
 <body>
 <div class="container">
-    <div class="body-content">
+    <div class="body-content" ng-app="ChatApp">
         <div class="page-header">
             <span class="input-group-btn">
 
@@ -30,21 +33,21 @@
                 </button>
             </span>
         </div>
-        <div class="row">
-            <div draggable="true" class="col-lg-4 panel" ng-app="ChatApp">
+        <div class="row" ng-controller="ChatController">
+            <div draggable="true" class="col-lg-4 panel">
                 <div class="panel-heading">Chat</div>
                 <div>
                     <div class="input-group">
                         <input id="messageInput" type="text" class="form-control">
                       <span class="input-group-btn">
-                        <button class="btn btn-default glyphicon glyphicon-envelope" type="button"
-                                onclick="sendData();"></button>
+                        <button class="btn btn-default" type="button"
+                                onclick="sendData();"><span class="glyphicon glyphicon-envelope"></span></button>
                       </span>
                     </div>
                 </div>
                 <br/>
 
-                <div class="highlight" style="overflow: auto;width:auto;height: 600px;" ng-controller="ChatController">
+                <div class="highlight" style="overflow: auto;width:auto;height: 600px;">
                     <ul class="list-group">
                         <li class="list-group-item" ng-repeat="message in messageArr">
                             <span class="badge">{{message.sender}}</span>
@@ -54,11 +57,25 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-lg-8">
-                <h1>Conference</h1>
+            <div class="col-lg-2 panel">
+                <ul class="list-group">
+                    <li class="list-group-item" ng-repeat="member in memberArr">
+                        <a href="#" data-toggle="tooltip" data-original-title="Some tooltip text!" title="">Hover over
+                            me</a>
+                        <a id = "thumb" style="width:70px;" href="http://vk.com/{{member.nick}}" target="_blank"
+                           data-toggle="tooltip" data-placement="top"
+                           title="{{member.firstName + ' ' + member.lastName}}">
+                            <img src="{{member.photoUrl}}" class="img-circle img-responsive">
+                        </a>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
 </body>
+<script src='/resources/chat/js/login.js'></script>
+<script language="javascript">
+    var enteredUser = null;
+</script>
 </html>

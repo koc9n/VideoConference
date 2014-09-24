@@ -4,16 +4,23 @@
 var myApp = angular.module('ChatApp',[]);
 
 myApp.controller('ChatController', ['$scope', function($scope) {
-    $scope.messageArr = messages;
+    $scope.messageArr = [];
+    $scope.memberArr = [];
 
-    $scope.pushToArray = function(item) {
-
-        // Add new item to collection.
+    $scope.pushToMessages = function(item) {
         $scope.messageArr.push({
             sender: item.sender,
             text: item.text,
             recipients:item.recipients
         });
+    };
 
+    $scope.pushToMembers = function(item) {
+        $scope.memberArr.push({
+            nick: item.nick,
+            photoUrl: item.photoUrl,
+            firstName: item.firstName,
+            lastName: item.lastName
+        });
     };
 }]);

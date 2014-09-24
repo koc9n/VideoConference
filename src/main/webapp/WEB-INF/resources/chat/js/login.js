@@ -20,17 +20,19 @@ function authInfo(response) {
                         '&photo_200_orig=' + r.response[0].photo_200_orig, 'blob');
                     Chat.socket.onmessage = function (evt) {
                         var dataObj = angular.fromJson(evt.data);
+                        var el = document.getElementsByClassName('ng-scope')[1];
+                        var scope = angular.element(el).scope();
                         switch (dataObj.eventType) {
                             case 'MESSAGE':
-                                var el = document.getElementsByClassName('ng-scope')[1];
-                                var scope = angular.element(el).scope()
-                                scope.pushToArray(dataObj.message);
+                                scope.pushToMessages(dataObj.message);
                                 scope.$apply();
                                 break;
                             case 'USER_CONNECTED':
                                 if (enteredUser == null) {
                                     enteredUser = dataObj.member.nick;
                                 }
+                                scope.pushToMembers(dataObj.member);
+                                scope.$apply();
                                 break;
                             case 'USER_DISCONNECTED':
                                 break;
