@@ -1,9 +1,9 @@
 package com.gmail.mironchik.kos.websocket.ws.chat;
 
-import com.gmail.mironchik.kos.web.dto.EventType;
-import com.gmail.mironchik.kos.web.dto.Member;
-import com.gmail.mironchik.kos.web.dto.Message;
-import com.gmail.mironchik.kos.web.dto.TransferData;
+import com.gmail.mironchik.kos.web.model.EventType;
+import com.gmail.mironchik.kos.web.model.Member;
+import com.gmail.mironchik.kos.web.model.Message;
+import com.gmail.mironchik.kos.web.model.TransferData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;

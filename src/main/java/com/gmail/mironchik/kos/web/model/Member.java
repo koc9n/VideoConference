@@ -1,4 +1,6 @@
-package com.gmail.mironchik.kos.web.dto;
+package com.gmail.mironchik.kos.web.model;
+
+import com.gmail.mironchik.kos.web.dao.MongoDocument;
 
 /**
  * Created by k.mironchik on 9/16/2014.
