@@ -4,9 +4,17 @@ import com.gmail.mironchik.kos.web.model.EventType;
 import com.gmail.mironchik.kos.web.model.Member;
 import com.gmail.mironchik.kos.web.model.Message;
 import com.gmail.mironchik.kos.web.model.TransferData;
+import com.gmail.mironchik.kos.web.services.MessageRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -40,12 +48,14 @@ import java.util.Set;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-
+@Component
 @ServerEndpoint(value = "/ws/chat")
 public class ChatAnnotation {
 
-    private static final Log log = LogFactory.getLog(ChatAnnotation.class);
+    @Autowired
+    MessageRepository messageRepository;
+
+    static Logger log = LoggerFactory.getLogger(ChatAnnotation.class);
 
     private static final Map<String, Set<Session>> connectedUsers =
             new HashMap();
@@ -79,7 +89,7 @@ public class ChatAnnotation {
         try {
             message = mapper.writeValueAsString(transferData);
         } catch (IOException e) {
-            log.error(e);
+            log.error("error during converting object to JSON string", e);
         }
         return message;
     }
@@ -115,10 +125,12 @@ public class ChatAnnotation {
         try {
             msg = mapper.readValue(message, Message.class);
         } catch (IOException e) {
-            log.error(e);
+            log.error("error during read object from JSON string",e);
         }
         TransferData transferData = new TransferData(EventType.MESSAGE);
         transferData.setMessage(msg);
+
+        messageRepository.save(msg);
 
         broadcast(writeData(transferData));
     }

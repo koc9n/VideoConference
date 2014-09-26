@@ -1,18 +1,31 @@
 package com.gmail.mironchik.kos.web;
 
+import com.gmail.mironchik.kos.web.model.Message;
+import com.gmail.mironchik.kos.web.services.MessageRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 /**
  * Created by k.mironchik on 9/15/2014.
  */
-@Controller("/chat")
+@Controller
 public class ChatController {
 
-    @RequestMapping(value = "/login/{nick}", method = RequestMethod.GET)
+    @Autowired
+    MessageRepository messageRepository;
+
+    @RequestMapping(value = "/chat/{nick}", method = RequestMethod.GET)
     @ResponseBody
     public Object login(@PathVariable String nick){
-        return null;
+        Message message = new Message();
+        message.setSender(nick);
+        message.setText("hello " + nick);
+        message.setRecipients(Collections.EMPTY_LIST);
+        messageRepository.save(message);
+        return "{success:true}";
     }
 }
