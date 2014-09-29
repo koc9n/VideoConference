@@ -16,6 +16,10 @@
  */
 package com.gmail.mironchik.kos.websocket;
 
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +39,7 @@ public class ChatSocketConfig implements ServerApplicationConfig {
         // Deploy all WebSocket endpoints defined by annotations in the examples
         // web application. Filter out all others to avoid issues when running
         // tests on Gump
+
         Set<Class<?>> results = new HashSet<>();
         for (Class<?> clazz : scanned) {
             if (clazz.getPackage().getName().startsWith("com.gmail.mironchik.kos.websocket.")) {

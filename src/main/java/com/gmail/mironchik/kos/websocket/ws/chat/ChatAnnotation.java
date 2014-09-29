@@ -15,6 +15,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -48,12 +51,16 @@ import java.util.Set;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-@Component
 @ServerEndpoint(value = "/ws/chat")
 public class ChatAnnotation {
 
-    @Autowired
-    MessageRepository messageRepository;
+
+    MessageRepository messageRepository = getMessageRepository();
+
+    private MessageRepository getMessageRepository() {
+        ApplicationContext ctx = ContextLoader.getCurrentWebApplicationContext();
+        return (MessageRepository) ctx.getBean("messageRepository");
+    }
 
     static Logger log = LoggerFactory.getLogger(ChatAnnotation.class);
 
@@ -68,7 +75,6 @@ public class ChatAnnotation {
 
     private String nickname;
     private Session session;
-
 
     @OnOpen
     public void start(Session session) {
@@ -125,7 +131,7 @@ public class ChatAnnotation {
         try {
             msg = mapper.readValue(message, Message.class);
         } catch (IOException e) {
-            log.error("error during read object from JSON string",e);
+            log.error("error during read object from JSON string", e);
         }
         TransferData transferData = new TransferData(EventType.MESSAGE);
         transferData.setMessage(msg);

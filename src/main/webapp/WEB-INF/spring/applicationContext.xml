@@ -12,7 +12,8 @@
 
     <context:annotation-config/>
 
-    <context:component-scan annotation-config="true" base-package="com.gmail.mironchik.kos"/>
+    <context:component-scan annotation-config="true" base-package="com.gmail.mironchik.kos.*"/>
+
     <mongo:mongo host="localhost"/>
 
     <mongo:db-factory

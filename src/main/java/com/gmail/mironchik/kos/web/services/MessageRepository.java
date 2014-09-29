@@ -3,6 +3,7 @@ package com.gmail.mironchik.kos.web.services;
 import com.gmail.mironchik.kos.web.model.Member;
 import com.gmail.mironchik.kos.web.model.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.repository.CrudRepository;
@@ -13,7 +14,8 @@ import java.util.List;
 /**
  * Created by k.mironchik on 9/25/2014.
  */
-@Repository
+@Repository("messageRepository")
+@Scope("singleton")
 public class MessageRepository  {
     @Autowired
     private MongoOperations mongoOperations;
