@@ -1,4 +1,4 @@
-package com.gmail.mironchik.kos.web;
+package com.gmail.mironchik.kos.web.controller;
 
 import com.gmail.mironchik.kos.web.model.Message;
 import com.gmail.mironchik.kos.web.services.MessageRepository;

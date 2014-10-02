@@ -1,6 +1,9 @@
 /**
  * Created by kos on 24.09.2014.
  */
+
+var enteredUser = null;
+
 function sendData() {
     var messageEl = document.getElementById('messageInput');
     var messageObj = {sender: enteredUser, text: messageEl.value, recipients: []};
@@ -8,12 +11,11 @@ function sendData() {
     messageEl.value = "";
 }
 
-function authInfo(response) {
+function initChat(response) {
     if (response.session) {
         if (enteredUser == null) {
             VK.Api.call('users.get', {uids: response.session.mid, fields: "screen_name,photo_200_orig"}, function (r) {
                 if (r.response) {
-
                     Chat.initialize('/ws/chat?screen_name=' + r.response[0].screen_name +
                         '&first_name=' + r.response[0].first_name +
                         '&last_name=' + r.response[0].last_name +
@@ -45,6 +47,9 @@ function authInfo(response) {
         Chat.socket.close();
         enteredUser = null;
     }
+}
+function authInfo(response) {
+    initChat(response);
 }
 
 VK.init({

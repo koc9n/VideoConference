@@ -12,7 +12,7 @@
 
     <context:annotation-config/>
 
-    <context:component-scan annotation-config="true" base-package="com.gmail.mironchik.kos.*"/>
+    <context:component-scan annotation-config="true" base-package="com.gmail.mironchik.kos.web.model,com.gmail.mironchik.kos.web.services,com.gmail.mironchik.kos.websocket"/>
 
     <mongo:mongo host="localhost"/>
 

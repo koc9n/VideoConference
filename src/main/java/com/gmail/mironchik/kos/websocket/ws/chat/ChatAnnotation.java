@@ -54,7 +54,6 @@ import java.util.Set;
 @ServerEndpoint(value = "/ws/chat")
 public class ChatAnnotation {
 
-
     MessageRepository messageRepository = getMessageRepository();
 
     private MessageRepository getMessageRepository() {
