@@ -27,12 +27,12 @@
     <article >
         <h1>Login to chat using your VK account</h1>
         <p class="lead"></p>
-        <div class="btn-group-sm">
-        <span class="input-group-btn">
-            <button id="login_button" class="btn btn-default" type="button"
+        <div class="btn-group-lg">
+        <span align="center" class="input-group-btn">
+            <button id="login_button" class="btn-lg btn-success" type="button"
                     onclick="VK.Auth.login(authInfo);">Login VK
             </button>
-            <button class="btn btn-default" type="button" id="logout_button"
+            <button style="display: none" class="btn btn-default" type="button" id="logout_button"
                     onclick="VK.Auth.logout(authInfo);">Logout VK
             </button>
         </span>
