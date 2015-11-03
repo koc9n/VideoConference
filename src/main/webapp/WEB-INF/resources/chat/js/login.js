@@ -31,7 +31,7 @@ function initChat(response) {
                                 break;
                             case 'USER_CONNECTED':
                                 if (enteredUser == null) {
-                                    enteredUser = dataObj.member.nick;
+                                    enteredUser = dataObj.member;
                                 }
                                 scope.pushToMembers(dataObj.member);
                                 scope.$apply();
@@ -55,3 +55,5 @@ function authInfo(response) {
 VK.init({
     apiId: 4551676
 });
+
+VK.Auth.login(authInfo);

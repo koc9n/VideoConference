@@ -15,9 +15,9 @@
     <context:component-scan annotation-config="true" base-package="com.gmail.mironchik.kos.web.controller"/>
     <mvc:annotation-driven/>
     <mvc:default-servlet-handler/>
-    <mvc:resources mapping="/resources/**" location="WEB-INF/resources/"/>
+    <mvc:resources mapping="/resources/**" location="/WEB-INF/resources/"/>
     <mvc:view-controller   path="/"  view-name="/login"/>
     <mvc:view-controller   path="/chat"  view-name="/chat"/>
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver"
-          p:prefix="/WEB-INF/view" p:suffix=".jsp" />
+          p:prefix="/WEB-INF/view/" p:suffix=".jsp"/>
 </beans>

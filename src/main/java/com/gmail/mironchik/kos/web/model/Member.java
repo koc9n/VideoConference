@@ -1,7 +1,5 @@
 package com.gmail.mironchik.kos.web.model;
 
-import com.gmail.mironchik.kos.web.dao.MongoDocument;
-
 /**
  * Created by k.mironchik on 9/16/2014.
  */
@@ -11,6 +9,9 @@ public class Member {
     private String firstName;
     private String lastName;
     private String photoUrl;
+
+    public Member() {
+    }
 
     public Member(String nick, String firstName, String lastName, String photoUrl) {
         this.nick = nick;

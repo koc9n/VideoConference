@@ -11,31 +11,26 @@
     <title>Enter to Chat</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link href="/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/resources/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-    <script src='/resources/angular.js'></script>
-    <script src='/resources/ui-bootstrap-tpls-0.11.2.min.js'></script>
-    <script src='/resources/controller.js'></script>
-    <script src="//vk.com/js/api/openapi.js"></script>
+    <link rel="stylesheet" href="/resources/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/resources/bootstrap/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/resources/chat/css/chat.css"/>
 </head>
 <body class="container">
-<header class="page-header">
-    <img class="logo" src="" alt=""/>
-    <h1 style="text-align: center;">Social Chat</h1>
+<header class="navbar navbar-default">
+    <div class="navbar-header">
+        <span class="navbar-brand">Social Chat</span>
+    </div>
 </header>
 <section class="jumbotron">
-    <article >
-        <h1>Login to chat using your VK account</h1>
-        <p class="lead"></p>
-        <div class="btn-group-lg">
-        <span align="center" class="input-group-btn">
-            <button id="login_button" class="btn-lg btn-success" type="button"
-                    onclick="VK.Auth.login(authInfo);">Login VK
-            </button>
-            <button style="display: none" class="btn btn-default" type="button" id="logout_button"
-                    onclick="VK.Auth.logout(authInfo);">Logout VK
-            </button>
-        </span>
+    <article>
+        <div class="auth-block">
+            <h1>Login to chat using your VK account</h1>
+
+            <div class="btn-group-lg">
+                <a class="btn btn-default btn-block"
+                   href="https://oauth.vk.com/authorize?client_id=4551676&scope=friends,photos,offline&redirect_uri=http://192.168.0.102/login&response_type=code&v=5.28"
+                   target="_top">Authorize</a>
+            </div>
         </div>
     </article>
 </section>
@@ -44,5 +39,4 @@
     <p>Site is powered by Konstantin Mironchik. All rigths reserved.</p>
 </footer>
 </body>
-<script src='/resources/chat/js/login.js'></script>
 </html>

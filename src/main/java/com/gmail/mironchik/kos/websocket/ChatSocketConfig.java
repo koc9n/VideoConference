@@ -16,16 +16,11 @@
  */
 package com.gmail.mironchik.kos.websocket;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.websocket.Endpoint;
 import javax.websocket.server.ServerApplicationConfig;
 import javax.websocket.server.ServerEndpointConfig;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChatSocketConfig implements ServerApplicationConfig {
 

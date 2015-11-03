@@ -1,8 +1,5 @@
 package com.gmail.mironchik.kos.web.model;
 
-import com.gmail.mironchik.kos.web.dao.MongoDocument;
-import org.springframework.data.mongodb.core.index.Indexed;
-
 import java.util.List;
 
 /**
@@ -11,15 +8,15 @@ import java.util.List;
 
 
 public class Message {
-    private String sender;
+    private Member sender;
     private String text;
     private List<String> recipients;
 
-    public String getSender() {
+    public Member getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    public void setSender(Member sender) {
         this.sender = sender;
     }
 

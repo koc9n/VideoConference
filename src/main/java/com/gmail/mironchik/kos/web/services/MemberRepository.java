@@ -1,6 +1,6 @@
 package com.gmail.mironchik.kos.web.services;
 
-import com.gmail.mironchik.kos.web.model.Message;
+import com.gmail.mironchik.kos.web.dao.Member;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Repository;
@@ -8,20 +8,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * Created by k.mironchik on 9/25/2014.
+ * Created by kos on 13.02.2015.
  */
-@Repository("messageRepository")
-public class MessageRepository {
+@Repository("memberRepository")
+public class MemberRepository {
     @Autowired
     private MongoOperations mongoOperations;
 
-    public List<Message> findAll() {
-        return mongoOperations.findAll(Message.class);
+    public List<Member> findAll() {
+        return mongoOperations.findAll(Member.class);
     }
 
-    public void save(Message message) {
-        mongoOperations.save(message);
+    public void save(Member member) {
+        mongoOperations.save(member);
     }
-
-
 }
